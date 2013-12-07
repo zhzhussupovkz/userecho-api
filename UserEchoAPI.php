@@ -89,6 +89,8 @@ class UserEchoAPI {
 		return $final;
 	}
 
+	/********************** Пользователи ***************************/
+
 	/*
 	get_users - Список всех пользователей проекта.
 	*/
@@ -136,5 +138,123 @@ class UserEchoAPI {
 	*/
 	public function  get_users_comments($user_id = null) {
 		return $this->get_request("users/$user_id/comments");
+	}
+
+	/********************** Форумы ***************************/
+
+	/*
+	get_forums - Список всех топиков проекта.
+	*/
+	public function get_forums() {
+		return $this->get_request("forums");
+	}
+
+	/*
+	get_forums_categories - Список категорий выбранного форума.
+	*/
+	public function get_forums_categories($forum_id = null) {
+		return $this->get_request("forums/$forum_id/categories");
+	}
+
+	/*
+	get_forums_types - Типы поддерживаемых отзывов для выбранного форума.
+	*/
+	public function get_forums_types($forum_id = null) {
+		return $this->get_request("forums/$forum_id/types");
+	}
+
+	/*
+	get_forums_tags - Список тегов поддерживаемых выбранным форумом.
+	*/
+	public function get_forums_tags($forum_id = null) {
+		return $this->get_request("forums/$forum_id/tags");
+	}
+
+	/*
+	create_forum - Создание нового форума
+
+	required:
+	name - Название форума
+
+	optional:
+	description - Описание форума
+	type - Тип форума. (PUBLIC, PRIVATE)
+	locale - Локализация форума по умолчанию (en, ru, es, fr, de, nl, is, et, kk, uk)
+	allow_anonymous_feedback - Разрешить анонимные отзывы (true или false)
+	allow_anonymous_votes - Разрешить анонимные голоса. (true или false)
+	allow_anonymous_comments - Разрешить анонимные комментарии. (true или false)
+	allow_private_sso_users - (true или false)
+	allow_private_view_all - Если данный форум является приватным, позволяет всем пользователям иметь 
+	доступ к форуму в режиме только для чтения. (true или false)
+	template_forum_id - Копирует все настройки и вид с предоставленного форума.
+	*/
+	public function create_forum($name = null, $params = array()) {
+		$required = array('name' => $name);
+		$params = array_merge($required, $params);
+		return $this->post_request("forums", $params);
+	}
+
+	/****************************** Топики *******************************/
+
+	/*
+	get_forums_feedback - Список отзывов для выбранного форума.
+	*/
+	public function get_forums_feedback($forum_id = null) {
+		return $this->get_request("forums/$forum_id/feedback");
+	}
+
+	/*
+	get_forums_user_feedback - Список отзывов, относящихся к выбранному форуму и пользователю.
+	*/
+	public function get_forums_user_feedback($forum_id = null, $user_id = null) {
+		return $this->get_request("forums/$forum_id/users/$user_id/feedback");
+	}
+
+	/*
+	search_feedback - Поиск по содержимому форума.
+	*/
+	public function search_feedback($forum_id = null) {
+		return $this->get_request("forums/$forum_id/feedback/search");
+	}
+
+	/*
+	get_feedback_by_category - Список отзывов для выбранной категории..
+	*/
+	public function get_feedback_by_category($category_id = null) {
+		return $this->get_request("categories/$category_id/feedback");
+	}
+
+	/*
+	get_feedback_info - Подробная информация по выбранному отзыву.
+	*/
+	public function get_feedback_info($feedback_id = null) {
+		return $this->get_request("feedback/$feedback_id");
+	}
+
+	/*
+	create_feedback - Создает новый топик.
+
+	required:
+	forum_id - Идентификатор форума.
+	header - Заголовок топика
+	feedback_type - Тип топика.
+
+	optional:
+	description - Описание топика.
+	show_voter - Показывать блок голосования. (true или false)
+	*/
+	public function create_feedback($forum_id = null, $header = null, $feedback_type = null, $params = array()) {
+		$required = array('header' => $header, 'feedback_type' => $feedback_type);
+		$params = array_merge($required, $params);
+		return $this->post_request("forums/$forum_id/feedback", $params);
+	}
+
+	/**************************** Комментарии ***************************/
+
+	/*
+	get_feedback_comments - Список комментариев по выбранному отзыву.
+	*/
+	public function get_feedback_comments($feedback_id = null) {
+		return $this->get_request("feedback/$feedback_id/comments");
 	}
 }
