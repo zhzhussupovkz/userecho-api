@@ -56,11 +56,11 @@ class UserEchoAPI {
 		curl_setopt_array($ch, $options);
 		$result = curl_exec($ch);
 		if ($result == false)
-			throw new Exception(curl_error($ch));
+			throw new UserEchoException(curl_error($ch));
 		curl_close($ch);
 		$final = json_decode($result, TRUE);
 		if (!$final)
-			throw new Exception('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
+			throw new UserEchoException('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
 		return $final;
 	}
 
@@ -81,11 +81,11 @@ class UserEchoAPI {
 		curl_setopt_array($ch, $options);
 		$result = curl_exec($ch);
 		if ($result == false)
-			throw new Exception(curl_error($ch));
+			throw new UserEchoException(curl_error($ch));
 		curl_close($ch);
 		$final = json_decode($result, TRUE);
 		if (!$final)
-			throw new Exception('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
+			throw new UserEchoException('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
 		return $final;
 	}
 
@@ -109,6 +109,8 @@ class UserEchoAPI {
 	get_users_by_id - Отображает сведения о профиле пользователя.
 	*/
 	public function get_users_by_id($user_id = null) {
+		if (!$user_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
 		return $this->get_request("users/$user_id");
 	}
 
@@ -116,6 +118,8 @@ class UserEchoAPI {
 	get_users_logout - Закрыть все сессии для выбранного пользователя.
 	*/
 	public function get_users_logout($user_id = null) {
+		if (!$user_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
 		return $this->get_request("users/$users_id/logout");
 	}
 
@@ -123,6 +127,8 @@ class UserEchoAPI {
 	get_users_sso - Отображает сведения о профиле пользователя по SSO guid.
 	*/
 	public function get_users_sso($sso_id = null) {
+		if (!$sso_id)
+			throw new UserEchoException("Не задан обязательный параметр: SSO guid");
 		return $this->get_request("users/sso/$sso_id");
 	}
 
@@ -130,6 +136,8 @@ class UserEchoAPI {
 	get_users_feedback - Список всех отзывов пользователя.
 	*/
 	public function get_users_feedback($user_id = null) {
+		if (!$user_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
 		return $this->get_request("users/$user_id/feedback");
 	}
 
@@ -137,6 +145,8 @@ class UserEchoAPI {
 	get_users_comments - Список всех комментариев пользователя.
 	*/
 	public function  get_users_comments($user_id = null) {
+		if (!$user_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
 		return $this->get_request("users/$user_id/comments");
 	}
 
@@ -153,6 +163,8 @@ class UserEchoAPI {
 	get_forums_categories - Список категорий выбранного форума.
 	*/
 	public function get_forums_categories($forum_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		return $this->get_request("forums/$forum_id/categories");
 	}
 
@@ -160,6 +172,8 @@ class UserEchoAPI {
 	get_forums_types - Типы поддерживаемых отзывов для выбранного форума.
 	*/
 	public function get_forums_types($forum_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		return $this->get_request("forums/$forum_id/types");
 	}
 
@@ -167,6 +181,8 @@ class UserEchoAPI {
 	get_forums_tags - Список тегов поддерживаемых выбранным форумом.
 	*/
 	public function get_forums_tags($forum_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		return $this->get_request("forums/$forum_id/tags");
 	}
 
@@ -189,6 +205,10 @@ class UserEchoAPI {
 	template_forum_id - Копирует все настройки и вид с предоставленного форума.
 	*/
 	public function create_forum($name = null, $params = array()) {
+		if (!$name)
+			throw new UserEchoException("Не задан обязательный параметр: название форума");
+		if (!is_array($params))
+			throw new UserEchoException("Неверный формат параметров запроса");
 		$required = array('name' => $name);
 		$params = array_merge($required, $params);
 		return $this->post_request("forums", $params);
@@ -200,6 +220,8 @@ class UserEchoAPI {
 	get_forums_feedback - Список отзывов для выбранного форума.
 	*/
 	public function get_forums_feedback($forum_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		return $this->get_request("forums/$forum_id/feedback");
 	}
 
@@ -207,6 +229,10 @@ class UserEchoAPI {
 	get_forums_user_feedback - Список отзывов, относящихся к выбранному форуму и пользователю.
 	*/
 	public function get_forums_user_feedback($forum_id = null, $user_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
+		if (!$user_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
 		return $this->get_request("forums/$forum_id/users/$user_id/feedback");
 	}
 
@@ -214,6 +240,8 @@ class UserEchoAPI {
 	search_feedback - Поиск по содержимому форума.
 	*/
 	public function search_feedback($forum_id = null) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		return $this->get_request("forums/$forum_id/feedback/search");
 	}
 
@@ -221,6 +249,8 @@ class UserEchoAPI {
 	get_feedback_by_category - Список отзывов для выбранной категории..
 	*/
 	public function get_feedback_by_category($category_id = null) {
+		if (!$category_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор категории");
 		return $this->get_request("categories/$category_id/feedback");
 	}
 
@@ -228,6 +258,8 @@ class UserEchoAPI {
 	get_feedback_info - Подробная информация по выбранному отзыву.
 	*/
 	public function get_feedback_info($feedback_id = null) {
+		if (!$feedback_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор отзыва");
 		return $this->get_request("feedback/$feedback_id");
 	}
 
@@ -244,6 +276,14 @@ class UserEchoAPI {
 	show_voter - Показывать блок голосования. (true или false)
 	*/
 	public function create_feedback($forum_id = null, $header = null, $feedback_type = null, $params = array()) {
+		if (!$forum_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
+		if (!$header)
+			throw new UserEchoException("Не задан обязательный параметр: заголовок топика");
+		if (!$feedback_type)
+			throw new UserEchoException("Не задан обязательный параметр: тип топика");
+		if (!is_array($params))
+			throw new UserEchoException("Неверный формат параметров запроса");
 		$required = array('header' => $header, 'feedback_type' => $feedback_type);
 		$params = array_merge($required, $params);
 		return $this->post_request("forums/$forum_id/feedback", $params);
@@ -255,6 +295,13 @@ class UserEchoAPI {
 	get_feedback_comments - Список комментариев по выбранному отзыву.
 	*/
 	public function get_feedback_comments($feedback_id = null) {
+		if (!$feedback_id)
+			throw new UserEchoException("Не задан обязательный параметр: идентификатор отзыва");
 		return $this->get_request("feedback/$feedback_id/comments");
 	}
 }
+
+class UserEchoException extends Exception {}
+
+
+
