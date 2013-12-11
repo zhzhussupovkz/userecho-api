@@ -41,8 +41,9 @@ class UserEchoAPI {
 	}
 
 	//get request
-	private function get_request($command = null, $params = array()) {
+	private function get_request($command = null, $params = array(), $json = true) {
 		$auth = array('access_token' => $this->api_key);
+		$params = array_merge($auth, $params);
 		$params = http_build_query($params);
 		$url = $this->api_url.''.$command.'.json?'.$params;
 
@@ -58,7 +59,10 @@ class UserEchoAPI {
 		if ($result == false)
 			throw new UserEchoException(curl_error($ch));
 		curl_close($ch);
-		$final = json_decode($result, TRUE);
+		if ($json == true)
+			$final = json_decode($result, TRUE);
+		else
+			$final = $result;
 		if (!$final)
 			throw new UserEchoException('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
 		return $final;
@@ -86,6 +90,8 @@ class UserEchoAPI {
 		$final = json_decode($result, TRUE);
 		if (!$final)
 			throw new UserEchoException('Получены неверные данные, пожалуйста, убедитесь, что запрашиваемый метод API существует');
+		if ($final['status'] == 'fail')
+			return $final['message'];
 		return $final;
 	}
 
@@ -95,14 +101,18 @@ class UserEchoAPI {
 	get_users - Список всех пользователей проекта.
 	*/
 	public function get_users() {
-		return $this->get_request('users');
+		$result = $this->get_request('users');
+		if ($result['status'] == 'success')
+			return $result['users'];
 	}
 
 	/*
 	get_users_current - Отображает сведения о профиле текущего пользователя.
 	*/
 	public function get_users_current() {
-		return $this->get_request('users/current');
+		$result = $this->get_request('users/current');
+		if ($result['status'] == 'success')
+			return $result['user'];
 	}
 
 	/*
@@ -111,7 +121,9 @@ class UserEchoAPI {
 	public function get_users_by_id($user_id = null) {
 		if (!$user_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
-		return $this->get_request("users/$user_id");
+		$result = $this->get_request("users/$user_id");
+		if ($result['status'] == 'success')
+			return $result['user'];
 	}
 
 	/*
@@ -120,16 +132,18 @@ class UserEchoAPI {
 	public function get_users_logout($user_id = null) {
 		if (!$user_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
-		return $this->get_request("users/$users_id/logout");
+		return $this->get_request("users/$user_id/logout", array(), false);
 	}
 
 	/*
 	get_users_sso - Отображает сведения о профиле пользователя по SSO guid.
 	*/
-	public function get_users_sso($sso_id = null) {
+	public function get_users_by_sso($sso_id = null) {
 		if (!$sso_id)
 			throw new UserEchoException("Не задан обязательный параметр: SSO guid");
-		return $this->get_request("users/sso/$sso_id");
+		$result = $this->get_request("users/sso/$sso_id");
+		if ($result['status'] == 'success')
+			return $result['user'];
 	}
 
 	/*
@@ -138,7 +152,9 @@ class UserEchoAPI {
 	public function get_users_feedback($user_id = null) {
 		if (!$user_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
-		return $this->get_request("users/$user_id/feedback");
+		$result = $this->get_request("users/$user_id/feedback");
+		if ($result['status'] == 'success')
+			return $result['feedbacks'];
 	}
 
 	/*
@@ -147,7 +163,9 @@ class UserEchoAPI {
 	public function  get_users_comments($user_id = null) {
 		if (!$user_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
-		return $this->get_request("users/$user_id/comments");
+		$result = $this->get_request("users/$user_id/comments");
+		if ($result['status'] == 'success')
+			return $result['comments'];
 	}
 
 	/********************** Форумы ***************************/
@@ -156,7 +174,9 @@ class UserEchoAPI {
 	get_forums - Список всех топиков проекта.
 	*/
 	public function get_forums() {
-		return $this->get_request("forums");
+		$result = $this->get_request("forums");
+		if ($result['status'] == 'success')
+			return $result['forums'];
 	}
 
 	/*
@@ -165,7 +185,9 @@ class UserEchoAPI {
 	public function get_forums_categories($forum_id = null) {
 		if (!$forum_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
-		return $this->get_request("forums/$forum_id/categories");
+		$result = $this->get_request("forums/$forum_id/categories");
+		if ($result['status'] == 'success')
+			return $result['categories'];
 	}
 
 	/*
@@ -174,7 +196,9 @@ class UserEchoAPI {
 	public function get_forums_types($forum_id = null) {
 		if (!$forum_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
-		return $this->get_request("forums/$forum_id/types");
+		$result = $this->get_request("forums/$forum_id/types");
+		if ($result['status'] == 'success')
+			return $result['types'];
 	}
 
 	/*
@@ -183,7 +207,9 @@ class UserEchoAPI {
 	public function get_forums_tags($forum_id = null) {
 		if (!$forum_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
-		return $this->get_request("forums/$forum_id/tags");
+		$result = $this->get_request("forums/$forum_id/tags");
+		if ($result['status'] == 'success')
+			return $result['tags'];
 	}
 
 	/*
@@ -222,7 +248,9 @@ class UserEchoAPI {
 	public function get_forums_feedback($forum_id = null) {
 		if (!$forum_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
-		return $this->get_request("forums/$forum_id/feedback");
+		$result = $this->get_request("forums/$forum_id/feedback");
+		if ($result['status'] == 'success')
+			return $result['feedbacks'];
 	}
 
 	/*
@@ -233,7 +261,9 @@ class UserEchoAPI {
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор форума");
 		if (!$user_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор пользователя");
-		return $this->get_request("forums/$forum_id/users/$user_id/feedback");
+		$result = $this->get_request("forums/$forum_id/users/$user_id/feedback");
+		if ($result['status'] == 'success')
+			return $result['feedbacks'];
 	}
 
 	/*
@@ -251,7 +281,9 @@ class UserEchoAPI {
 	public function get_feedback_by_category($category_id = null) {
 		if (!$category_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор категории");
-		return $this->get_request("categories/$category_id/feedback");
+		$result = $this->get_request("categories/$category_id/feedback");
+		if ($result['status'] == 'success')
+			return $result['feedbacks'];
 	}
 
 	/*
@@ -260,7 +292,9 @@ class UserEchoAPI {
 	public function get_feedback_info($feedback_id = null) {
 		if (!$feedback_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор отзыва");
-		return $this->get_request("feedback/$feedback_id");
+		$result = $this->get_request("feedback/$feedback_id");
+		if ($result['status'] == 'success')
+			return $result['feedback'];
 	}
 
 	/*
@@ -297,7 +331,9 @@ class UserEchoAPI {
 	public function get_feedback_comments($feedback_id = null) {
 		if (!$feedback_id)
 			throw new UserEchoException("Не задан обязательный параметр: идентификатор отзыва");
-		return $this->get_request("feedback/$feedback_id/comments");
+		$result = $this->get_request("feedback/$feedback_id/comments");
+		if ($result['status'] == 'success')
+			return $result['comments'];
 	}
 }
 
